@@ -8,6 +8,7 @@ import {
   GripVertical
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import DealDetailDrawer from '@/components/DealDetailDrawer';
 
 const STAGES = [
   { id: 'INQUIRY', label: 'Inquiry', color: 'bg-blue-500' },
@@ -19,15 +20,18 @@ const STAGES = [
 export default function DealsPage() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDeal, setSelectedDeal] = useState(null);
+
+  const loadDeals = async () => {
+    try {
+      setLoading(true);
+      const data = await apiFetch('/deals');
+      setDeals(data);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  };
 
   useEffect(() => {
-    async function loadDeals() {
-      try {
-        const data = await apiFetch('/deals');
-        setDeals(data);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    }
     loadDeals();
   }, []);
 
@@ -105,6 +109,7 @@ export default function DealsPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       className="group bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer relative overflow-hidden"
+                      onClick={() => setSelectedDeal(deal)}
                     >
                       {/* Interactive Selection Placeholder */}
                       <div className="absolute top-4 right-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -170,6 +175,12 @@ export default function DealsPage() {
           );
         })}
       </div>
+
+      <DealDetailDrawer 
+        deal={selectedDeal} 
+        onClose={() => setSelectedDeal(null)} 
+        onUpdate={() => { loadDeals(); setSelectedDeal(null); }} 
+      />
     </div>
   );
 }

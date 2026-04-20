@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/exportUtils';
 import AgentLeaderboard from '@/components/AgentLeaderboard';
+import FollowUpWidget from '@/components/FollowUpWidget';
 import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
@@ -194,43 +195,39 @@ export default function DashboardPage() {
             {user?.role !== 'AGENT' ? (
               <AgentLeaderboard agents={leaderboard} />
             ) : (
-              <motion.div 
-                whileHover={{ y: -5 }}
-                className="bg-slate-900 rounded-[40px] p-10 text-white relative h-full flex flex-col justify-between shadow-2xl overflow-hidden group border border-white/5"
-              >
-                <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/20 blur-[100px] rounded-full group-hover:scale-150 transition-transform duration-700"></div>
-                <div className="space-y-8 relative z-10">
-                    <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center">
-                      <CheckCircle2 size={24} className="text-success" />
-                    </div>
-                    <div>
-                      <h4 className="text-2xl font-black tracking-tight leading-none">Goal Achievement</h4>
-                      <p className="text-slate-400 text-sm mt-3 leading-relaxed font-medium">You have achieved <span className="text-white font-black italic">82%</span> of your quarterly revenue target. Keep the momentum.</p>
-                    </div>
-                </div>
-                <div className="pt-10 relative z-10">
-                  <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: '82%' }}
-                        transition={{ duration: 1.5, ease: "easeOut" }}
-                        className="h-full bg-success" 
-                        style={{boxShadow: '0 0 20px #10b981'}}
-                      />
-                  </div>
-                  <div className="flex justify-between mt-4">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Q2 Progress</span>
-                      <span className="text-[10px] font-black text-white uppercase tracking-widest italic">82% / 100%</span>
-                  </div>
-                </div>
-                <motion.button 
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full py-5 bg-white text-slate-900 rounded-3xl font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-100 transition shadow-xl mt-12 relative z-10"
+              <div className="space-y-8">
+                <FollowUpWidget />
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  className="bg-slate-900 rounded-[40px] p-10 text-white relative h-full flex flex-col justify-between shadow-2xl overflow-hidden group border border-white/5"
                 >
-                  View Breakdown
-                </motion.button>
-              </motion.div>
+                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/20 blur-[100px] rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                  <div className="space-y-8 relative z-10">
+                      <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center">
+                        <CheckCircle2 size={24} className="text-success" />
+                      </div>
+                      <div>
+                        <h4 className="text-2xl font-black tracking-tight leading-none">Goal Achievement</h4>
+                        <p className="text-slate-400 text-sm mt-3 leading-relaxed font-medium">You have achieved <span className="text-white font-black italic">82%</span> of your quarterly revenue target. Keep the momentum.</p>
+                      </div>
+                  </div>
+                  <div className="pt-10 relative z-10">
+                    <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: '82%' }}
+                          transition={{ duration: 1.5, ease: "easeOut" }}
+                          className="h-full bg-success" 
+                          style={{boxShadow: '0 0 20px #10b981'}}
+                        />
+                    </div>
+                    <div className="flex justify-between mt-4">
+                        <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Q2 Progress</span>
+                        <span className="text-[10px] font-black text-white uppercase tracking-widest italic">82% / 100%</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             )}
         </motion.div>
       </div>

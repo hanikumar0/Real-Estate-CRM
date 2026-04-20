@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
+import Link from 'next/link';
 import { UserCheck, MapPin, DollarSign, Briefcase, Activity } from 'lucide-react';
 
 export default function ClientsPage() {
@@ -65,9 +66,11 @@ export default function ClientsPage() {
               </div>
 
               <div className="mt-8">
-                <button className="w-full py-3 bg-slate-50 group-hover:bg-primary group-hover:text-white rounded-xl text-slate-400 text-xs font-black uppercase tracking-widest transition-all">
-                  Open Client Folder
-                </button>
+                <Link href={`/clients/${client._id}`}>
+                  <button className="w-full py-3 bg-slate-50 group-hover:bg-primary group-hover:text-white rounded-xl text-slate-400 text-xs font-black uppercase tracking-widest transition-all">
+                    Open Client Folder
+                  </button>
+                </Link>
               </div>
             </div>
           ))}

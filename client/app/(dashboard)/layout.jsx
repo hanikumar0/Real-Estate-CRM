@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
@@ -14,16 +15,6 @@ export default function DashboardLayout({ children }) {
     } else {
       setAuthorized(true);
     }
-    
-    // Listens for 'storage' events to logout from all tabs
-    const handleStorageChange = () => {
-      if (!localStorage.getItem('token')) {
-        router.replace('/login');
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
   }, [router]);
 
   if (!authorized) return (
@@ -34,9 +25,21 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex bg-slate-50 min-h-screen">
-      <Sidebar />
-      <main className="flex-1 ml-64 min-h-screen p-4">
-        <div className="bg-white rounded-2xl shadow-sm min-h-[calc(100vh-2rem)] border border-slate-100">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      
+      <main className="flex-1 lg:ml-64 min-h-screen p-4 group">
+        {/* Mobile Header Trigger */}
+        <div className="lg:hidden flex items-center justify-between p-4 bg-white rounded-xl mb-4 shadow-sm border border-slate-100">
+           <h1 className="text-xl font-black text-primary italic tracking-tighter">EstateFlow</h1>
+           <button 
+             onClick={() => setIsSidebarOpen(true)}
+             className="p-2 bg-slate-50 rounded-lg text-slate-400"
+           >
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+           </button>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm min-h-[calc(100vh-2rem)] border border-slate-100 overflow-hidden">
           {children}
         </div>
       </main>

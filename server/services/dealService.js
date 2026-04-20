@@ -118,6 +118,24 @@ class DealService {
     return await deal.save();
   }
 
+  async addDocument(id, documentData, user) {
+    const deal = await Deal.findById(id);
+    if (!deal) throw new Error('Deal not found');
+
+    if (user.role === 'AGENT' && deal.agentId.toString() !== user.userId) {
+      throw new Error('Unauthorized');
+    }
+
+    deal.documents.push(documentData);
+    deal.activities.push({
+      type: 'DOCUMENT_UPLOAD',
+      message: `Document added: ${documentData.title}`,
+      createdBy: user.userId
+    });
+
+    return await deal.save();
+  }
+
   async getRevenueSummary() {
     return await Deal.aggregate([
       { $match: { stage: 'CLOSED' } },

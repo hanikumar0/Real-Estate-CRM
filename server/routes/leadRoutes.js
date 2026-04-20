@@ -16,6 +16,9 @@ router.put('/:id', leadController.update);
 router.post('/:id/notes', leadController.addNote);
 router.get('/:id/matches', leadController.getMatches);
 
+router.get('/reminders', leadController.getUpcomingReminders);
+router.post('/:id/follow-up', leadController.addFollowUp);
+
 // Admin/Manager Only
 router.patch('/:id/assign', managerOnly, leadController.assign);
 

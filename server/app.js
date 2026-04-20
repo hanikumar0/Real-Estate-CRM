@@ -19,7 +19,21 @@ dotenv.config();
 const app = express();
 
 // Security Middlewares
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+const allowedOrigins = [
+  'http://localhost:3000',
+  process.env.FRONTEND_URL // We will set this in Render env vars
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Blocked by CORS Production Policy'));
+    }
+  },
+  credentials: true 
+}));
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 

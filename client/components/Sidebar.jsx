@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, Building2, WalletCards, Briefcase, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -12,7 +13,7 @@ const navItems = [
   { name: 'Clients', href: '/clients', icon: WalletCards },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const router = useRouter();
   const [role, setRole] = useState(null);
@@ -22,7 +23,21 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="w-64 bg-white h-screen border-r border-slate-200 flex flex-col fixed left-0 top-0">
+    <>
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[80] lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={`w-64 bg-white h-screen border-r border-slate-200 flex flex-col fixed left-0 top-0 z-[90] transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
       <div className="p-8">
         <h1 className="text-2xl font-black text-primary tracking-tighter">EstateFlow</h1>
       </div>
@@ -69,6 +84,7 @@ export default function Sidebar() {
           Logout
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

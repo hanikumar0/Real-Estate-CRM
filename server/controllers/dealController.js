@@ -45,6 +45,15 @@ class DealController {
       res.status(400).json({ message: err.message });
     }
   }
+
+  async addDocument(req, res) {
+    try {
+      const deal = await dealService.addDocument(req.params.id, req.body, req.user);
+      res.status(200).json(deal);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
 }
 
 export default new DealController();

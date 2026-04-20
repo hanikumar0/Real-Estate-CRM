@@ -140,6 +140,45 @@ class LeadService {
     return await Lead.findOne({ phone, archived: false });
   }
 
+  async addFollowUp(id, date, note, user) {
+    const lead = await Lead.findOne({ _id: id, archived: false });
+    if (!lead) throw new Error('Lead not found');
+
+    if (user.role === 'AGENT' && lead.assignedAgent?.toString() !== user.userId) {
+      throw new Error('Access denied');
+    }
+
+    lead.followUps.push({ date, note, completed: false });
+    return await lead.save();
+  }
+
+  async getUpcomingFollowUps(user) {
+    const query = { 
+      'followUps.completed': false, 
+      archived: false 
+    };
+    
+    if (user.role === 'AGENT') {
+      query.assignedAgent = user.userId;
+    }
+
+    const leads = await Lead.find(query).select('name phone followUps').lean();
+    
+    // Flatten and filter for upcoming/overdue
+    return leads.flatMap(lead => 
+      lead.followUps
+        .filter(f => !f.completed)
+        .map(f => ({
+          leadId: lead._id,
+          name: lead.name,
+          phone: lead.phone,
+          date: f.date,
+          note: f.note,
+          followUpId: f._id
+        }))
+    ).sort((a, b) => new Date(a.date) - new Date(b.date));
+  }
+
   // Helper for n8n automation
   async _notifyN8n(event, payload) {
     try {

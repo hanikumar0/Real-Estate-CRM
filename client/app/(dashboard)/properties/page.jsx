@@ -17,21 +17,26 @@ export default function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('grid'); // 'grid' | 'map'
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filters, setFilters] = useState({ search: '', type: '', minPrice: '', maxPrice: '' });
 
   const loadProperties = async () => {
     try {
       setLoading(true);
-      const data = await apiFetch('/properties');
+      const query = new URLSearchParams(filters).toString();
+      const data = await apiFetch(`/properties?${query}`);
       setProperties(data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
 
   useEffect(() => {
-    loadProperties();
-  }, []);
+    const timer = setTimeout(() => {
+      loadProperties();
+    }, 500); // Debounce search
+    return () => clearTimeout(timer);
+  }, [filters]);
 
-  if (loading) return (
+  if (loading && properties.length === 0) return (
     <div className="p-10 space-y-10">
       <div className="h-20 bg-slate-50 rounded-3xl animate-pulse"></div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -70,6 +75,58 @@ export default function PropertiesPage() {
            </button>
         </div>
       </header>
+
+      {/* Advanced Filter Bar */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm"
+      >
+        <div className="space-y-2">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Asset Search</label>
+           <input 
+             type="text" 
+             placeholder="Title or location..." 
+             className="w-full h-12 px-5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-primary/50 font-bold text-sm"
+             value={filters.search}
+             onChange={e => setFilters({...filters, search: e.target.value})}
+           />
+        </div>
+        <div className="space-y-2">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Category</label>
+           <select 
+             className="w-full h-12 px-5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-primary/50 font-bold text-sm appearance-none"
+             value={filters.type}
+             onChange={e => setFilters({...filters, type: e.target.value})}
+           >
+             <option value="">All Types</option>
+             <option value="RESIDENTIAL">Residential</option>
+             <option value="COMMERCIAL">Commercial</option>
+             <option value="INDUSTRIAL">Industrial</option>
+             <option value="LAND">Land</option>
+           </select>
+        </div>
+        <div className="space-y-2">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Min Price</label>
+           <input 
+             type="number" 
+             placeholder="No Min" 
+             className="w-full h-12 px-5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-primary/50 font-bold text-sm"
+             value={filters.minPrice}
+             onChange={e => setFilters({...filters, minPrice: e.target.value})}
+           />
+        </div>
+        <div className="space-y-2">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Max Price</label>
+           <input 
+             type="number" 
+             placeholder="No Max" 
+             className="w-full h-12 px-5 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:border-primary/50 font-bold text-sm"
+             value={filters.maxPrice}
+             onChange={e => setFilters({...filters, maxPrice: e.target.value})}
+           />
+        </div>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {view === 'grid' ? (

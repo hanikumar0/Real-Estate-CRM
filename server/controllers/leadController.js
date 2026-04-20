@@ -87,6 +87,24 @@ class LeadController {
       res.status(404).json({ message: err.message });
     }
   }
+  async addFollowUp(req, res) {
+    try {
+      const { date, note } = req.body;
+      const lead = await leadService.addFollowUp(req.params.id, date, note, req.user);
+      res.status(200).json(lead);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
+
+  async getUpcomingReminders(req, res) {
+    try {
+      const reminders = await leadService.getUpcomingFollowUps(req.user);
+      res.status(200).json(reminders);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
 }
 
 export default new LeadController();

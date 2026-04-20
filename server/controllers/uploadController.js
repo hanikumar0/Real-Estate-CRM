@@ -1,20 +1,16 @@
 class UploadController {
   async uploadSingle(req, res) {
     try {
-      if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
-      }
+      if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
-      // In production, you would upload to Cloudinary/S3 here
-      // For now, return the local server path
-      const fileUrl = `/uploads/${req.file.filename}`;
+      // Cloudinary returns URL in 'path', local multer returns filename in 'filename'
+      const fileUrl = req.file.path ? req.file.path : `/uploads/${req.file.filename}`;
       
       res.status(201).json({
         message: 'File uploaded successfully',
         url: fileUrl,
-        filename: req.file.filename,
-        mimetype: req.file.mimetype,
-        size: req.file.size
+        filename: req.file.filename || req.file.public_id,
+        id: req.file.public_id || req.file.filename
       });
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -23,15 +19,12 @@ class UploadController {
 
   async uploadMultiple(req, res) {
     try {
-      if (!req.files || req.files.length === 0) {
-        return res.status(400).json({ message: 'No files uploaded' });
-      }
+      if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'No files uploaded' });
 
       const files = req.files.map(file => ({
-        url: `/uploads/${file.filename}`,
-        filename: file.filename,
-        mimetype: file.mimetype,
-        size: file.size
+        url: file.path ? file.path : `/uploads/${file.filename}`,
+        filename: file.filename || file.public_id,
+        id: file.public_id || file.filename
       }));
 
       res.status(201).json({
