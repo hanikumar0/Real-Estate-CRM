@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Forced Rebuild - Design System Active */
+
+@layer base {
+  body {
+    @apply bg-background text-slate-800 antialiased font-sans transition-colors duration-500;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-xl font-bold transition hover:opacity-90 active:scale-95 shadow-sm inline-flex items-center justify-center gap-2;
+  }
+  
+  .card-premium {
+    @apply bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition duration-300;
+  }
+}
