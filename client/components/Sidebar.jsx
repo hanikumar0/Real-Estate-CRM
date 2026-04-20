@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, Building2, WalletCards, Briefcase, ShieldCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +14,7 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [role, setRole] = useState(null);
 
   useEffect(() => {
@@ -46,21 +47,24 @@ export default function Sidebar() {
           <div className="pt-4 mt-4 border-t border-slate-50">
             <p className="px-4 mb-2 text-[10px] font-black uppercase text-slate-400 tracking-widest">Admin Control</p>
             <Link 
-              href="/admin"
+              href="/admin-portal"
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition duration-200 ${
-                pathname.startsWith('/admin') ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                pathname.startsWith('/admin-portal') ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <ShieldCheck size={18} strokeWidth={pathname.startsWith('/admin') ? 2.5 : 2} />
-              Control Center
+              <ShieldCheck size={18} strokeWidth={pathname.startsWith('/admin-portal') ? 2.5 : 2} />
+              Secure Portal
             </Link>
           </div>
         )}
       </nav>
       <div className="p-4 border-t">
         <button 
-          onClick={() => { localStorage.removeItem('token'); window.location.href='/login'; }}
-          className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg"
+          onClick={() => { 
+            localStorage.clear();
+            router.replace('/login'); 
+          }}
+          className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg flex items-center gap-2"
         >
           Logout
         </button>

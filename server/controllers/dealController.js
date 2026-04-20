@@ -28,6 +28,15 @@ class DealController {
     }
   }
 
+  async update(req, res) {
+    try {
+      const deal = await dealService.updateDeal(req.params.id, req.body, req.user);
+      res.status(200).json(deal);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
+
   async getRevenue(req, res) {
     try {
       const summary = await dealService.getRevenueSummary();

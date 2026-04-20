@@ -36,6 +36,24 @@ class AnalyticsController {
       res.status(400).json({ message: err.message });
     }
   }
+
+  async getAdminStats(req, res) {
+    try {
+      const stats = await analyticsService.getAdminOverview();
+      res.status(200).json(stats);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
+
+  async testN8n(req, res) {
+    try {
+      const success = await analyticsService.testAutomation(req.user);
+      res.status(200).json({ success });
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
 }
 
 export default new AnalyticsController();

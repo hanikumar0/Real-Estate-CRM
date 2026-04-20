@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { exportToExcel, exportToPDF } from '@/lib/exportUtils';
 import { Search, Plus, Filter, MoreHorizontal, Phone, FileText, FileSpreadsheet, Target as TargetIcon } from 'lucide-react';
 import LeadMatchesModal from '@/components/LeadMatchesModal';
+import LeadFormModal from '@/components/LeadFormModal';
 
 export default function LeadsPage() {
   const [leads, setLeads] = useState([]);
@@ -12,6 +13,19 @@ export default function LeadsPage() {
   const router = useRouter();
   const [selectedLeadForMatch, setSelectedLeadForMatch] = useState(null);
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+
+  async function loadLeads() {
+    setLoading(true);
+    try {
+      const data = await apiFetch('/leads');
+      setLeads(data);
+    } catch (err) { 
+      console.error(err); 
+    } finally { 
+      setLoading(false); 
+    }
+  }
 
   const openMatcher = (e, lead) => {
     e.stopPropagation();
@@ -44,13 +58,6 @@ export default function LeadsPage() {
   };
 
   useEffect(() => {
-    async function loadLeads() {
-      try {
-        const data = await apiFetch('/leads');
-        setLeads(data);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    }
     loadLeads();
   }, []);
 
@@ -67,7 +74,7 @@ export default function LeadsPage() {
     return 'bg-blue-50 text-blue-600 border-blue-100 shadow-sm shadow-blue-50';
   };
 
-  if (loading) return <div className="p-12 animate-pulse space-y-4">
+  if (loading && leads.length === 0) return <div className="p-12 animate-pulse space-y-4">
     <div className="h-10 bg-slate-100 w-1/4 rounded-xl"></div>
     <div className="h-64 bg-slate-50 rounded-3xl"></div>
   </div>;
@@ -95,7 +102,10 @@ export default function LeadsPage() {
               <FileText size={16} className="text-primary" /> PDF
             </button>
           </div>
-          <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-black transition shadow-xl">
+          <button 
+            onClick={() => setIsLeadModalOpen(true)}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-black transition shadow-xl"
+          >
             <Plus size={18} /> New Lead
           </button>
         </div>
@@ -156,7 +166,7 @@ export default function LeadsPage() {
                     </span>
                   </td>
                   <td className="px-8 py-6">
-                    <div className="text-sm font-bold text-slate-700 font-data">${lead.budget?.toLocaleString() || 'N/A'}</div>
+                    <div className="text-sm font-bold text-slate-700 font-data">${lead.budget?.toLocaleString() || '0'}</div>
                     <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{lead.source}</div>
                   </td>
                   <td className="px-8 py-6">
@@ -188,6 +198,12 @@ export default function LeadsPage() {
         isOpen={isMatchModalOpen} 
         onClose={() => setIsMatchModalOpen(false)} 
         lead={selectedLeadForMatch} 
+      />
+
+      <LeadFormModal 
+        isOpen={isLeadModalOpen} 
+        onClose={() => setIsLeadModalOpen(false)} 
+        onSuccess={loadLeads} 
       />
     </div>
   );

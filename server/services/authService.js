@@ -5,15 +5,17 @@ import bcrypt from 'bcryptjs';
 class AuthService {
   async register(userData) {
     const { email, password, name } = userData;
+    // Explicitly ignore any 'role' passed in userData to prevent privilege escalation (BR-001)
 
-    const existingUser = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase().trim(); // BR-005
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) throw new Error('User already exists');
 
     return await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
-      role: 'AGENT'
+      role: 'AGENT' // Default role for new signups
     });
   }
 

@@ -10,5 +10,6 @@ router.post('/', dealController.create);
 router.get('/', dealController.getAll);
 router.get('/revenue/summary', managerOnly, dealController.getRevenue);
 router.patch('/:id/stage', dealController.updateStage);
+router.put('/:id', dealController.update);
 
 export default router;

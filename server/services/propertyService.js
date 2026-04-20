@@ -46,14 +46,14 @@ class PropertyService {
       throw new Error('Unauthorized');
     }
 
-    return await Property.findByIdAndUpdate(id, data, { new: true });
+    return await Property.findByIdAndUpdate(id, data, { new: true, runValidators: true });
   }
 
   async linkLead(id, leadId) {
     return await Property.findByIdAndUpdate(
       id,
       { $addToSet: { linkedLeads: leadId } },
-      { new: true }
+      { new: true, runValidators: true }
     );
   }
 }

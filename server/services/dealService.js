@@ -1,9 +1,23 @@
 import Deal from '../models/Deal.js';
+import Lead from '../models/Lead.js';
+import Client from '../models/Client.js';
 import mongoose from 'mongoose';
 import analyticsService from './analyticsService.js';
 
 class DealService {
   async createDeal(data, user) {
+    // BR-002: Fetch client and linked lead to validate status and update it
+    const client = await Client.findById(data.clientId).populate('linkedLead');
+    if (!client) throw new Error('Client not found');
+    
+    const lead = client.linkedLead;
+    if (!lead) throw new Error('No linked lead found for this client');
+
+    // PRD Validation: A Deal cannot be created unless the Lead's status is "QUALIFIED"
+    if (lead.status !== 'QUALIFIED') {
+      throw new Error(`Lead must be QUALIFIED to create a deal. Current status: ${lead.status}`);
+    }
+
     const deal = await Deal.create({
       ...data,
       activities: [{
@@ -12,6 +26,14 @@ class DealService {
         createdBy: user.userId
       }]
     });
+
+    // BR-002 Fix: Update lead status to uppercase 'IN_DEAL'
+    lead.status = 'IN_DEAL';
+    lead.notes.push({
+      message: `Lead moved to Deal phase (Deal ID: ${deal._id})`,
+      createdBy: user.userId
+    });
+    await lead.save();
 
     // Notify n8n
     if (process.env.N8N_WEBHOOK_URL) {
@@ -77,6 +99,23 @@ class DealService {
     }
 
     return updatedDeal;
+  }
+
+  async updateDeal(id, updateData, user) {
+    const deal = await Deal.findById(id);
+    if (!deal) throw new Error('Deal not found');
+
+    if (user.role === 'AGENT' && deal.agentId.toString() !== user.userId) {
+      throw new Error('Unauthorized');
+    }
+
+    // Update fields
+    Object.keys(updateData).forEach(key => {
+      deal[key] = updateData[key];
+    });
+
+    // Save triggers the pre('save') hook in Deal.js for commission calculation
+    return await deal.save();
   }
 
   async getRevenueSummary() {

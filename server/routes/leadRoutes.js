@@ -4,11 +4,15 @@ import { protect, adminOnly, managerOnly } from '../middleware/authMiddleware.js
 
 const router = express.Router();
 
-router.use(protect);
+// Public Routes
+router.get('/track', leadController.getTrackedStatus);
 
+// Protected Routes
+router.use(protect);
 router.post('/', leadController.create);
 router.get('/', leadController.getAll);
 router.patch('/:id/status', leadController.updateStatus);
+router.put('/:id', leadController.update);
 router.post('/:id/notes', leadController.addNote);
 router.get('/:id/matches', leadController.getMatches);
 

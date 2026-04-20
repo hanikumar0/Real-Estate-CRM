@@ -80,13 +80,33 @@ class LeadService {
   }
 
   async assignLead(id, agentId) {
-    const lead = await Lead.findById(id);
-    if (!lead) throw new Error('Lead not found');
+    const lead = await Lead.findOne({ _id: id, archived: false });
+    if (!lead) throw new Error('Lead not found or archived');
 
     lead.assignedAgent = agentId;
     lead.notes.push({
       message: `Lead assigned to agent ${agentId}`,
       createdBy: 'SYSTEM'
+    });
+
+    return await lead.save();
+  }
+
+  async updateLead(id, updateData, user) {
+    const lead = await Lead.findOne({ _id: id, archived: false });
+    if (!lead) throw new Error('Lead not found or archived');
+
+    // RBAC Check
+    if (user.role === 'AGENT' && lead.assignedAgent?.toString() !== user.userId) {
+      throw new Error('Access denied');
+    }
+
+    // List of allowed fields to update
+    const allowedFields = ['name', 'phone', 'email', 'budget', 'locationPreference', 'source'];
+    Object.keys(updateData).forEach(key => {
+      if (allowedFields.includes(key)) {
+        lead[key] = updateData[key];
+      }
     });
 
     return await lead.save();
@@ -116,14 +136,26 @@ class LeadService {
     return await lead.save();
   }
 
+  async getLeadByPhone(phone) {
+    return await Lead.findOne({ phone, archived: false });
+  }
+
   // Helper for n8n automation
   async _notifyN8n(event, payload) {
     try {
-      await fetch(process.env.N8N_WEBHOOK_URL, {
+      const webhookUrl = process.env.N8N_WEBHOOK_URL;
+      const secret = process.env.WEBHOOK_SECRET;
+
+      if (!webhookUrl) {
+        console.warn(`⚠️  [N8N_SKIP] No webhook URL configured for event: ${event}`);
+        return;
+      }
+
+      const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'X-Webhook-Secret': process.env.WEBHOOK_SECRET || ''
+          'X-Webhook-Secret': secret || ''
         },
         body: JSON.stringify({
           source: 'ESTATEFLOW_CRM',
@@ -132,8 +164,14 @@ class LeadService {
           payload
         })
       });
+
+      if (res.ok) {
+        console.log(`🚀 [N8N_SUCCESS] Delivered event: ${event}`);
+      } else {
+        console.error(`❌ [N8N_FAILURE] Event: ${event} failed with status ${res.status}`);
+      }
     } catch (err) {
-      console.warn(`[Automation] n8n notification failed for ${event}:`, err.message);
+      console.warn(`❌ [N8N_ERROR] n8n connection failed for ${event}:`, err.message);
     }
   }
 }

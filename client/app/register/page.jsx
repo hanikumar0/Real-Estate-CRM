@@ -31,6 +31,7 @@ export default function RegisterPage() {
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({ name: data.name, role: data.role }));
+      localStorage.setItem('role', data.role);
       
       router.push('/dashboard');
     } catch (err) {

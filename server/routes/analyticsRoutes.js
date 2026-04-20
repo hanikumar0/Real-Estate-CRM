@@ -10,5 +10,7 @@ router.get('/dashboard', analyticsController.getDashboard);
 router.get('/sales-trends', managerOnly, analyticsController.getSalesTrends);
 router.get('/leaderboard', managerOnly, analyticsController.getLeaderboard);
 router.get('/sources', managerOnly, analyticsController.getSources);
+router.get('/admin-stats', managerOnly, analyticsController.getAdminStats);
+router.post('/test-n8n', managerOnly, analyticsController.testN8n);
 
 export default router;

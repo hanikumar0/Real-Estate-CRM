@@ -21,5 +21,13 @@ const connectDB = async () => {
 connectDB().then(() => {
   app.listen(PORT, () => {
     console.log(`🚀 EstateFlow Master API running on port ${PORT}`);
+    
+    // Automation Status Check
+    const n8nUrl = process.env.N8N_WEBHOOK_URL;
+    if (n8nUrl) {
+      console.log(`⛓️  [AUTOMATION] n8n Webhook Linked: ${n8nUrl.substring(0, 30)}...`);
+    } else {
+      console.warn('⚠️  [AUTOMATION] n8n Webhook not configured. Workflow sync disabled.');
+    }
   });
 });

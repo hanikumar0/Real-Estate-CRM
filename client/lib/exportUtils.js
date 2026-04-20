@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 /**
  * EstateFlow Export Utility
@@ -8,6 +8,10 @@ import 'jspdf-autotable';
  */
 
 export const exportToExcel = (data, fileName) => {
+  if (!data || data.length === 0) {
+    alert('No data to export');
+    return;
+  }
   const worksheet = XLSX.utils.json_to_sheet(data);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
@@ -17,7 +21,12 @@ export const exportToExcel = (data, fileName) => {
 };
 
 export const exportToPDF = (data, headers, title, fileName) => {
-  const doc = jsPDF();
+  if (!data || data.length === 0) {
+    alert('No data to export');
+    return;
+  }
+  // Use new jsPDF() or jsPDF() depending on version, 2.5+ uses new.
+  const doc = new jsPDF();
   
   // Set Header Style
   doc.setFontSize(22);
@@ -32,10 +41,10 @@ export const exportToPDF = (data, headers, title, fileName) => {
   // Table Generation
   const tableRows = data.map(item => headers.map(header => {
     const value = header.key.split('.').reduce((obj, key) => obj?.[key], item);
-    return value?.toString() || 'N/A';
+    return value !== undefined && value !== null ? value.toString() : 'N/A';
   }));
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: 45,
     head: [headers.map(h => h.label.toUpperCase())],
     body: tableRows,

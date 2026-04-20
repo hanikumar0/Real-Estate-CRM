@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { exportToExcel, exportToPDF } from '@/lib/exportUtils';
 import AgentLeaderboard from '@/components/AgentLeaderboard';
+import { motion } from 'framer-motion';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({ totalLeads: 0, totalDeals: 0, totalRevenue: 0, conversionRate: 0 });

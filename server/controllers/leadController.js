@@ -58,6 +58,35 @@ class LeadController {
       res.status(400).json({ message: err.message });
     }
   }
+
+  async update(req, res) {
+    try {
+      const lead = await leadService.updateLead(req.params.id, req.body, req.user);
+      res.status(200).json(lead);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
+  }
+
+  async getTrackedStatus(req, res) {
+    try {
+      const { phone } = req.query;
+      if (!phone) throw new Error('Phone number is required');
+      const lead = await leadService.getLeadByPhone(phone);
+      if (!lead) throw new Error('No lead found with this number');
+      
+      // Return redacted info for client privacy
+      res.status(200).json({
+        name: lead.name,
+        status: lead.status,
+        updatedAt: lead.updatedAt,
+        source: lead.source,
+        hasAgent: !!lead.assignedAgent
+      });
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
+  }
 }
 
 export default new LeadController();

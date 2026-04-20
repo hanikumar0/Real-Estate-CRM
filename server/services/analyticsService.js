@@ -26,6 +26,23 @@ class AnalyticsService {
     };
   }
 
+  async getAdminOverview() {
+    const [agents, traffic, leads, deals] = await Promise.all([
+      User.countDocuments({ role: 'AGENT' }),
+      // Mocking traffic but could be from logs in real app
+      Promise.resolve(98542), 
+      Lead.countDocuments({}),
+      Deal.countDocuments({})
+    ]);
+
+    return {
+      totalAgents: agents,
+      apiTraffic: traffic,
+      totalLeads: leads,
+      totalDeals: deals
+    };
+  }
+
   async getRevenueTrends() {
     return await Deal.aggregate([
       { $match: { stage: 'CLOSED' } },
@@ -122,23 +139,44 @@ class AnalyticsService {
     }
   }
 
-  async _notifyN8n(payload) {
+  async testAutomation(user) {
+    console.log(`[N8N_TEST] Manual trigger initiated by ${user.userId}`);
+    return await this._notifyN8n('TEST_PULSE', {
+      msg: 'EstateFlow Automation Health Check',
+      triggeredBy: user.userId,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  async _notifyN8n(event, payload) {
     try {
       const webhookUrl = process.env.N8N_WEBHOOK_URL;
       const secret = process.env.WEBHOOK_SECRET;
 
-      if (!webhookUrl) return;
+      if (!webhookUrl) {
+        console.warn('⚠️  [N8N_SKIP] No webhook URL configured. Skipping notification.');
+        return;
+      }
 
-      await fetch(webhookUrl, {
+      const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Webhook-Secret': secret
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ event, payload })
       });
+
+      if (res.ok) {
+        console.log(`🚀 [N8N_SUCCESS] Event: ${event} delivered successfully.`);
+      } else {
+        const errText = await res.text();
+        console.error(`❌ [N8N_FAILURE] Event: ${event} failed with status ${res.status}: ${errText}`);
+      }
+      return res.ok;
     } catch (err) {
-      console.error('[N8N_ERROR]', err.message);
+      console.error('❌ [N8N_ERROR]', err.message);
+      return false;
     }
   }
 }

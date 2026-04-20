@@ -14,16 +14,23 @@ export default function UserManagement() {
 
   async function loadUsers() {
     try {
-      const data = await apiFetch('/auth/agents'); // Admin-protected route
+      const data = await apiFetch('/users'); // Corrected from /auth/agents
       setUsers(data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
-
+ 
   const toggleStatus = async (userId, currentStatus) => {
-    // In a real app: await apiFetch(`/auth/users/${userId}/status`, { method: 'PATCH', body: { status: newStatus } });
     const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-    setUsers(users.map(u => u._id === userId ? { ...u, status: newStatus } : u));
+    try {
+      await apiFetch(`/users/${userId}/status`, { 
+        method: 'PATCH', 
+        body: JSON.stringify({ status: newStatus }) 
+      });
+      setUsers(users.map(u => u._id === userId ? { ...u, status: newStatus } : u));
+    } catch (err) {
+      alert('Failed to update status: ' + err.message);
+    }
   };
 
   if (loading) return <div className="animate-pulse space-y-4 pt-10"><div className="h-64 bg-slate-50 rounded-[32px]"></div></div>;
