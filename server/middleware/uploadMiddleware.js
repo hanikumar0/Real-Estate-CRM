@@ -4,9 +4,9 @@ import fs from 'fs';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
-// Ensure uploads directory exists (for local fallback)
+// Only ensure uploads directory exists locally (skips on Vercel/Production)
 const uploadDir = 'uploads/';
-if (!fs.existsSync(uploadDir)) {
+if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
@@ -45,7 +45,7 @@ const fileFilter = (req, file, cb) => {
   cb(new Error('Format not supported'));
 };
 
-const isProd = process.env.NODE_ENV === 'production' && process.env.CLOUDINARY_API_KEY;
+const isProd = process.env.VERCEL || (process.env.NODE_ENV === 'production' && (process.env.CLOUDINARY_API_KEY || process.env.CLOUDINARY_URL));
 
 export const upload = multer({
   storage: isProd ? cloudStorage : diskStorage,
