@@ -5,8 +5,11 @@ const inter = Inter({ subsets: ["latin"], variable: '--font-sans' });
 const manrope = Manrope({ subsets: ["latin"], variable: '--font-data' });
 
 export const metadata = {
-  title: "EstateFlow CRM",
-  description: "Modern Real Estate CRM for Agents",
+  title: "EstateFlow | Real Estate CRM",
+  description: "Modern Real Estate SaaS CRM for Agents and Managers",
+  icons: {
+    icon: "/favicon.ico",
+  }
 };
 
 export default function RootLayout({ children }) {
