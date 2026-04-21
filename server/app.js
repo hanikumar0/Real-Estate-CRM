@@ -19,25 +19,15 @@ dotenv.config();
 const app = express();
 
 // Security Middlewares
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://real-estate-crm-hazel.vercel.app',
-  'https://real-estate-crm-71em.vercel.app',
-  process.env.FRONTEND_URL 
-].filter(Boolean);
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
-      callback(null, true);
-    } else {
-      callback(new Error('Blocked by CORS Production Policy'));
-    }
-  },
+  origin: true,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Explicitly handle preflight requests for all routes
+app.options('*', cors());
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
@@ -59,12 +49,8 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Error Handling Middleware (Ensures CORS headers are present on errors)
+// Error Handling Middleware
 app.use((err, req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app'))) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
   res.status(err.status || 500).json({
     message: err.message || 'Internal Server Error'
   });
