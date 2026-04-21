@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import path from 'path';
+
+// Route Imports
 import authRoutes from './routes/authRoutes.js';
 import leadRoutes from './routes/leadRoutes.js';
 import propertyRoutes from './routes/propertyRoutes.js';
@@ -12,29 +14,53 @@ import userRoutes from './routes/userRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
-import path from 'path';
 
 dotenv.config();
 
 const app = express();
 
-// Security Middlewares
+// ======================
+// CORS PERMANENT FIX
+// ======================
+const allowedOrigins = [
+  "https://real-estate-crm-hazel.vercel.app",
+  "http://localhost:3000"
+];
+
 app.use(cors({
-  origin: true,
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS blocked by Production Policy"));
+    }
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
 
-// Explicitly handle preflight requests for all routes
-app.options('*', cors());
+app.options("*", cors()); // Enable pre-flight for all routes
 
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// Health Check / Root Route
+// ======================
+// CORE SYSTEM ROUTES
+// ======================
+
+// Root Health Check
 app.get("/", (req, res) => {
-  res.status(200).send("EstateFlow SaaS Backend Running Successfully");
+  res.status(200).send("Backend Running Successfully");
+});
+
+// API Health Endpoint
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ 
+    success: true, 
+    message: "API Healthy",
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Module Routes
@@ -49,10 +75,15 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Error Handling Middleware
+// ======================
+// ERROR MIDDLEWARE
+// ======================
 app.use((err, req, res, next) => {
+  console.error(`[Error] ${err.message}`);
   res.status(err.status || 500).json({
-    message: err.message || 'Internal Server Error'
+    success: false,
+    message: err.message || "Internal Server Error",
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
 });
 
