@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -12,14 +12,21 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  useEffect(() => {
+    console.log("🔍 Debug - Current API URL:", process.env.NEXT_PUBLIC_API_URL || "Not found");
+  }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      // Look for any possible API URL variable
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:5000/api';
       const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
+
+      console.log("🚀 Attempting login at:", `${cleanUrl}/auth/login`);
 
       const response = await fetch(`${cleanUrl}/auth/login`, {
         method: 'POST',
@@ -28,7 +35,6 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || 'Login failed');
 
       localStorage.setItem('token', data.token);
@@ -37,7 +43,10 @@ export default function LoginPage() {
       
       router.push('/dashboard');
     } catch (err) {
-      setError(err.message);
+      console.error("❌ Login Error:", err);
+      setError(err.message === 'Failed to fetch' 
+        ? "Cannot reach the server. Please check if NEXT_PUBLIC_API_URL is set correctly in Vercel." 
+        : err.message);
     } finally {
       setLoading(false);
     }
