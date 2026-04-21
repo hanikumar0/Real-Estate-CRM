@@ -4,10 +4,11 @@ A premium, production-grade Real Estate CRM designed for high-performing agencie
 
 ## 🚀 Live Demo
 - **Website**: [https://real-estate-crm-git-master-hani-kumars-projects.vercel.app/](https://real-estate-crm-git-master-hani-kumars-projects.vercel.app/)
+- **API (Backend)**: [https://real-estate-crm-71em-2tvzzuuov-hani-kumars-projects.vercel.app/](https://real-estate-crm-71em-2tvzzuuov-hani-kumars-projects.vercel.app/)
 
 ## 📡 Deployment Status
 - **Frontend**: [Vercel](https://vercel.com) (Live)
-- **Backend**: [Vercel](https://vercel.com) (Configured)
+- **Backend**: [Vercel](https://vercel.com) (Live)
 - **Database**: [MongoDB Atlas](https://mongodb.com) (Cloud)
 
 ## ✨ Core Features
@@ -25,16 +26,15 @@ A premium, production-grade Real Estate CRM designed for high-performing agencie
 
 ## 📦 Deployment Instructions
 
-### 1. Backend (Koyeb)
+### 1. Backend (Vercel)
 - **Root Directory**: `/server`
-- **Build Command**: `npm install`
-- **Run Command**: `node server.js`
+- **Build Settings**: Standard Node.js
 - **Env Vars**: `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_URL`, `FRONTEND_URL`.
 
 ### 2. Frontend (Vercel)
 - **Root Directory**: `/client`
 - **Framework**: Next.js
-- **Env Vars**: `NEXT_PUBLIC_API_URL` (pointing to your Koyeb API).
+- **Env Vars**: `NEXT_PUBLIC_API_URL` (pointing to your Vercel Backend).
 
 ---
 
