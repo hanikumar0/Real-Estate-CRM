@@ -63,7 +63,7 @@ export default function AdminLoginPage() {
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                   <input 
                     type="email" 
-                    autocomplete="email"
+                    autoComplete="email"
                     placeholder="admin@estateflow.com"
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-6 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all text-sm font-medium text-slate-900"
                     value={email}
@@ -79,7 +79,7 @@ export default function AdminLoginPage() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
                   <input 
                     type="password" 
-                    autocomplete="current-password"
+                    autoComplete="current-password"
                     placeholder="Enter your security key"
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-6 outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all text-sm font-medium text-slate-900"
                     value={password}
