@@ -21,8 +21,9 @@ const app = express();
 // Security Middlewares
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_URL // We will set this in Render env vars
-];
+  'https://real-estate-crm-git-main-hani-kumars-projects.vercel.app',
+  process.env.FRONTEND_URL 
+].filter(Boolean);
 
 app.use(cors({
   origin: function(origin, callback) {
