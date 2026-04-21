@@ -6,6 +6,12 @@
       "destination": "server/api/index.js"
     }
   ],
+  "functions": {
+    "server/api/index.js": {
+      "runtime": "vercel-node@latest",
+      "includeFiles": "server/**"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
