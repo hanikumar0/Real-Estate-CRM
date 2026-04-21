@@ -17,12 +17,16 @@ export default function ImageUploader({ onUploadSuccess, maxFiles = 10 }) {
     setUploading(true);
     
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:5000/api';
+      const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
+      const baseUrl = cleanUrl.replace('/api', '');
+
       const formData = new FormData();
       files.forEach(file => formData.append('files', file));
 
       // Use native fetch to avoid application/json default from helper
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/upload/multiple', {
+      const response = await fetch(`${cleanUrl}/upload/multiple`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -36,7 +40,7 @@ export default function ImageUploader({ onUploadSuccess, maxFiles = 10 }) {
       
       const newImages = data.files.map(file => ({
         id: file.filename,
-        url: `http://localhost:5000${file.url}`,
+        url: file.url.startsWith('http') ? file.url : `${baseUrl}${file.url}`,
         name: file.filename,
         loading: false
       }));

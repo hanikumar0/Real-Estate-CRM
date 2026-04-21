@@ -19,23 +19,27 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:5000/api';
+      const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
+
+      const response = await fetch(`${cleanUrl}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
 
       const data = await response.json();
-
       if (!response.ok) throw new Error(data.message || 'Registration failed');
 
       localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify({ name: data.name, role: data.role }));
-      localStorage.setItem('role', data.role);
+      localStorage.setItem('user', JSON.stringify({ name: data.user.name, role: data.user.role }));
+      localStorage.setItem('role', data.user.role);
       
       router.push('/dashboard');
     } catch (err) {
-      setError(err.message);
+      setError(err.message === 'Failed to fetch' 
+        ? "Server connection failed. Please check your internet or API configuration." 
+        : err.message);
     } finally {
       setLoading(false);
     }
@@ -70,8 +74,9 @@ export default function RegisterPage() {
               <input 
                 type="text" 
                 required 
+                autocomplete="name"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
-                placeholder="Jane Cooper"
+                placeholder="John Doe"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -81,8 +86,9 @@ export default function RegisterPage() {
               <input 
                 type="email" 
                 required 
+                autocomplete="email"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
-                placeholder="jane@estateflow.com"
+                placeholder="hani@estateflow.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -92,6 +98,7 @@ export default function RegisterPage() {
               <input 
                 type="password" 
                 required 
+                autocomplete="new-password"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                 placeholder="••••••••"
                 value={password}
@@ -109,7 +116,7 @@ export default function RegisterPage() {
           </form>
 
           <p className="text-center text-sm text-slate-500 pt-6">
-            Already have an account? <Link href="/login" className="text-primary font-bold hover:underline underline-offset-4">Sign in here</Link>
+            Already have an account? <Link href="/login" className="text-primary font-bold hover:underline underline-offset-4">Sign in</Link>
           </p>
         </motion.div>
       </div>
@@ -121,8 +128,8 @@ export default function RegisterPage() {
             <Sparkles size={32} />
           </div>
           <div className="space-y-4 max-w-sm">
-            <h2 className="text-4xl font-black text-white leading-tight">Join 500+ top-performing agents.</h2>
-            <p className="text-slate-400 font-medium">Experience the power of a CRM built for speed, data clarity, and high-conversion workflows.</p>
+            <h2 className="text-4xl font-black text-white leading-tight">Scale your agency with real-time data.</h2>
+            <p className="text-slate-400 font-medium">Join 500+ agents who use EstateFlow to close deals 3x faster.</p>
           </div>
         </div>
       </div>

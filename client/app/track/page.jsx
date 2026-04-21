@@ -17,8 +17,11 @@ export default function ClientTrackingPage() {
     setError('');
     setStatus(null);
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:5000/api';
+      const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
+
       // Direct fetch from public endpoint (no token needed here)
-      const res = await fetch(`http://localhost:5000/api/leads/track?phone=${phone}`);
+      const res = await fetch(`${cleanUrl}/leads/track?phone=${phone}`);
       if (!res.ok) throw new Error('Lead information not found. Please contact your agent.');
       const data = await res.json();
       setStatus(data);
