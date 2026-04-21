@@ -2,11 +2,13 @@
 
 A premium, production-grade Real Estate CRM designed for high-performing agencies. Built with **Next.js 14**, **Node.js**, **MongoDB**, and **Cloudinary**.
 
-## 🚀 Deployment Status
-- **Frontend**: [Vercel](https://vercel.com) (Continuous Deployment active)
-- **Backend**: [Koyeb](https://koyeb.com) (Continuous Deployment active)
-- **Cloud Storage**: Cloudinary (Active)
-- **Automation**: n8n (Optional)
+## 🚀 Live Demo
+- **Website**: [https://real-estate-crm-git-master-hani-kumars-projects.vercel.app/](https://real-estate-crm-git-master-hani-kumars-projects.vercel.app/)
+
+## 📡 Deployment Status
+- **Frontend**: [Vercel](https://vercel.com) (Live)
+- **Backend**: [Vercel](https://vercel.com) (Configured)
+- **Database**: [MongoDB Atlas](https://mongodb.com) (Cloud)
 
 ## ✨ Core Features
 - **High-Fidelity Dashboard**: Real-time sales analytics and agent leaderboards.
