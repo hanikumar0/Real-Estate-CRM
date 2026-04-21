@@ -22,28 +22,21 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'https://real-estate-crm-hazel.vercel.app',
-  'https://real-estate-crm-git-main-hani-kumars-projects.vercel.app',
   'https://real-estate-crm-71em.vercel.app',
   process.env.FRONTEND_URL 
 ].filter(Boolean);
 
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    
-    const isAllowed = allowedOrigins.some(allowedOrigin => {
-      return origin.startsWith(allowedOrigin) || allowedOrigin.includes(origin);
-    });
-
-    if (isAllowed || process.env.NODE_ENV === 'development') {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
-      console.warn(`CORS blocked for origin: ${origin}`);
       callback(new Error('Blocked by CORS Production Policy'));
     }
   },
-  credentials: true 
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true
 }));
 
 app.use(express.json());
@@ -51,12 +44,7 @@ app.use('/uploads', express.static('uploads'));
 
 // Health Check / Root Route
 app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "EstateFlow SaaS Backend Running Successfully",
-    version: "1.0.0",
-    currentTime: new Date().toISOString()
-  });
+  res.status(200).send("EstateFlow SaaS Backend Running Successfully");
 });
 
 // Module Routes
@@ -71,9 +59,15 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// 404 Handler for API routes
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ message: `API route ${req.originalUrl} not found` });
+// Error Handling Middleware (Ensures CORS headers are present on errors)
+app.use((err, req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error'
+  });
 });
 
 export default app;

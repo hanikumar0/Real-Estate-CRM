@@ -69,7 +69,7 @@ export default function LoginPage() {
                 <input 
                   type="email" 
                   required 
-                  autocomplete="email"
+                  autoComplete="email"
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                   placeholder="agent@estateflow.com"
                   value={email}
@@ -81,7 +81,7 @@ export default function LoginPage() {
                 <input 
                   type="password" 
                   required 
-                  autocomplete="current-password"
+                  autoComplete="current-password"
                   className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                   placeholder="••••••••"
                   value={password}

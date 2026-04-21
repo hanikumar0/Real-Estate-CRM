@@ -153,7 +153,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               
-              <div className="h-[350px] w-full">
+              <div className="h-[350px] min-h-[350px] w-full">
                 {user?.role === 'AGENT' ? (
                   <div className="h-full flex items-center justify-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-100">
                     <p className="text-slate-400 text-sm font-bold uppercase tracking-widest">Analytics reserved for management</p>

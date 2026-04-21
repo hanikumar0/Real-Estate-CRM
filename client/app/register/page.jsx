@@ -66,7 +66,7 @@ export default function RegisterPage() {
               <input 
                 type="text" 
                 required 
-                autocomplete="name"
+                autoComplete="name"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                 placeholder="John Doe"
                 value={name}
@@ -78,7 +78,7 @@ export default function RegisterPage() {
               <input 
                 type="email" 
                 required 
-                autocomplete="email"
+                autoComplete="email"
                 className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
                 placeholder="hani@estateflow.com"
                 value={email}
@@ -87,15 +87,15 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Password</label>
-              <input 
-                type="password" 
-                required 
-                autocomplete="new-password"
-                className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+                <input 
+                  type="password" 
+                  required 
+                  autoComplete="new-password"
+                  className="w-full px-5 py-4 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
             </div>
             
             <button 
