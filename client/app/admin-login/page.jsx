@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Lock, User, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { apiFetch } from '@/lib/api';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -17,17 +18,10 @@ export default function AdminLoginPage() {
     setError('');
     
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
-
-      const res = await fetch(`${cleanUrl}/auth/login`, {
+      const data = await apiFetch('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
       
       if (data.role !== 'ADMIN' && data.role !== 'MANAGER') {
         throw new Error('Access Denied: You do not have administrative privileges.');
@@ -39,7 +33,7 @@ export default function AdminLoginPage() {
       
       router.push('/admin-portal');
     } catch (err) {
-      setError(err.message || 'Connection failed. Please check your API URL.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }

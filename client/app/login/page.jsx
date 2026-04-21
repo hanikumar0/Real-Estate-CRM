@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Lock } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -22,20 +23,10 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Look for any possible API URL variable
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:5000/api';
-      const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
-
-      console.log("🚀 Attempting login at:", `${cleanUrl}/auth/login`);
-
-      const response = await fetch(`${cleanUrl}/auth/login`, {
+      const data = await apiFetch('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Login failed');
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({ name: data.name, role: data.role }));
@@ -43,10 +34,7 @@ export default function LoginPage() {
       
       router.push('/dashboard');
     } catch (err) {
-      console.error("❌ Login Error:", err);
-      setError(err.message === 'Failed to fetch' 
-        ? "Cannot reach the server. Please check if NEXT_PUBLIC_API_URL is set correctly in Vercel." 
-        : err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }

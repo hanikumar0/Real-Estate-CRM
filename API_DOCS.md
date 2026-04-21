@@ -2,7 +2,7 @@
 
 This document provides a comprehensive technical overview of the EstateFlow REST API. All endpoints are protected by JWT and RBAC unless otherwise specified.
 
-**Base URL:** `http://localhost:5000/api`  
+**Base URL:** `https://real-estate-crm-71em.vercel.app/api`  
 **Internal Secret Header:** `X-Webhook-Secret` (for n8n integrations)
 
 ---

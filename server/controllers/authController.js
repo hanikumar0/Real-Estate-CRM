@@ -4,7 +4,9 @@ class AuthController {
   async register(req, res) {
     try {
       const user = await authService.register(req.body);
-      res.status(201).json({ message: 'User registered', user });
+      // Generate token for immediate login after registration
+      const { token } = await authService.login(req.body.email, req.body.password);
+      res.status(201).json({ message: 'User registered', user, token });
     } catch (err) {
       res.status(400).json({ message: err.message });
     }

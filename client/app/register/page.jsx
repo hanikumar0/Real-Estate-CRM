@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Loader2, Sparkles } from 'lucide-react';
+import { apiFetch } from '@/lib/api';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -19,17 +20,10 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_URL || 'http://localhost:5000/api';
-      const cleanUrl = apiUrl.endsWith('/api') ? apiUrl : `${apiUrl}/api`;
-
-      const response = await fetch(`${cleanUrl}/auth/register`, {
+      const data = await apiFetch('/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Registration failed');
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({ name: data.user.name, role: data.user.role }));
@@ -37,9 +31,7 @@ export default function RegisterPage() {
       
       router.push('/dashboard');
     } catch (err) {
-      setError(err.message === 'Failed to fetch' 
-        ? "Server connection failed. Please check your internet or API configuration." 
-        : err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
