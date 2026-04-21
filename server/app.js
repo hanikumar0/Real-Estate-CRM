@@ -21,6 +21,7 @@ const app = express();
 // Security Middlewares
 const allowedOrigins = [
   'http://localhost:3000',
+  'https://real-estate-crm-hazel.vercel.app',
   'https://real-estate-crm-git-main-hani-kumars-projects.vercel.app',
   process.env.FRONTEND_URL 
 ].filter(Boolean);
