@@ -4,21 +4,13 @@ import fs from 'fs';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
-// Only ensure uploads directory exists locally (skips on Vercel/Production)
-const uploadDir = 'uploads/';
-try {
-  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-  }
-} catch (err) {
-  console.warn('⚠️ Skipped local directory creation:', err.message);
-}
+// Define flags
+const isVercel = process.env.VERCEL === '1' || !!process.env.VERCEL;
+const hasCloudinary = !!(process.env.CLOUDINARY_URL || process.env.CLOUDINARY_API_KEY);
+const useCloud = isVercel || hasCloudinary;
 
-// Cloudinary Configuration is automatic when CLOUDINARY_URL is in process.env
-// If using individual keys, they remain as fallback
-if (!process.env.CLOUDINARY_URL && process.env.CLOUDINARY_CLOUD_NAME) {
+// Cloudinary Configuration
+if (hasCloudinary && !process.env.CLOUDINARY_URL) {
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -26,6 +18,7 @@ if (!process.env.CLOUDINARY_URL && process.env.CLOUDINARY_CLOUD_NAME) {
   });
 }
 
+// 1. Cloudinary Storage (For Production/Vercel)
 const cloudStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -35,8 +28,16 @@ const cloudStorage = new CloudinaryStorage({
   }
 });
 
+// 2. Disk Storage (For Local Dev only)
+const uploadDir = 'uploads/';
 const diskStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => {
+    // Only try to create folder if we are actually using disk storage (Local)
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
@@ -51,10 +52,9 @@ const fileFilter = (req, file, cb) => {
   cb(new Error('Format not supported'));
 };
 
-const isProd = process.env.VERCEL || (process.env.NODE_ENV === 'production' && (process.env.CLOUDINARY_API_KEY || process.env.CLOUDINARY_URL));
-
+// Export the middleware
 export const upload = multer({
-  storage: isProd ? cloudStorage : diskStorage,
+  storage: useCloud ? cloudStorage : diskStorage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter
 });
