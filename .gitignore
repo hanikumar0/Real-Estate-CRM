@@ -1,5 +1,24 @@
-node_modules
-.next
+# Environments
+.env
 .env.local
-dist
-build
+.env.development.local
+.env.test.local
+.env.production.local
+server/.env
+
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Next.js
+.next/
+out/
+
+# Production
+build/
+dist/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
