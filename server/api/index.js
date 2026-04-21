@@ -32,25 +32,18 @@ const connectDB = async () => {
     }
 };
 
-// ==================================================
-// PRODUCTION-SAFE CORS (PERMANENT FIX)
-// ==================================================
-const allowedOrigins = [
-  "https://real-estate-crm-hazel.vercel.app",
-  "http://localhost:3000"
-];
-
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow if no origin (server-to-server), localhost, or any vercel.app subdomain
+    if (!origin || origin.includes('localhost') || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
-      callback(null, false); // Block other origins cleanly
+      callback(null, false);
     }
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"]
 }));
 
 // Handle OPTIONS preflight globally

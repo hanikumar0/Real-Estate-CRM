@@ -19,17 +19,14 @@ dotenv.config();
 
 const app = express();
 
-// ======================
-// CORS PERMANENT FIX
-// ======================
-const allowedOrigins = [
-  "https://real-estate-crm-hazel.vercel.app",
-  "http://localhost:3000"
-];
+const allowedOrigins = [/localhost/, /\.vercel\.app$/];
 
 app.use(cors({
   origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.some(pattern => {
+      if (typeof pattern === 'string') return origin === pattern;
+      return pattern.test(origin);
+    })) {
       callback(null, true);
     } else {
       callback(new Error("CORS blocked by Production Policy"));
