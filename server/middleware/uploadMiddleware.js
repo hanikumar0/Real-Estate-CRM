@@ -6,8 +6,14 @@ import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
 // Only ensure uploads directory exists locally (skips on Vercel/Production)
 const uploadDir = 'uploads/';
-if (process.env.NODE_ENV !== 'production' && !fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+  }
+} catch (err) {
+  console.warn('⚠️ Skipped local directory creation:', err.message);
 }
 
 // Cloudinary Configuration is automatic when CLOUDINARY_URL is in process.env
